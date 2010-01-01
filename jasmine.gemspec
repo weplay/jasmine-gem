@@ -10,14 +10,20 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rajan Agaskar", "Christian Williams"]
   s.date = %q{2009-12-31}
+  s.default_executable = %q{jasmine}
   s.description = %q{Javascript BDD test framework}
   s.email = %q{ragaskar@gmail.com}
-  s.executables = ["autospec", "edit_json.rb", "jasmine", "jeweler", "prettify_json.rb", "rackup", "rake", "rubyforge", "selenium-rc", "spec", "thin"]
+  s.executables = ["jasmine"]
   s.extra_rdoc_files = [
     "README.markdown"
   ]
   s.files = [
-    "bin/jasmine",
+    "generators/jasmine/jasmine_generator.rb",
+     "generators/jasmine/templates/INSTALL",
+     "generators/jasmine/templates/lib/tasks/jasmine.rake",
+     "generators/jasmine/templates/spec/javascripts/ExampleSpec.js",
+     "generators/jasmine/templates/spec/javascripts/SpecHelper.js",
+     "generators/jasmine/templates/spec/javascripts/support/jasmine_helper.rb",
      "jasmine/contrib/ruby/jasmine_runner.rb",
      "jasmine/contrib/ruby/jasmine_spec_builder.rb",
      "jasmine/contrib/ruby/run.html",
