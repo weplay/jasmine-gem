@@ -36,8 +36,6 @@ Gem::Specification.new do |s|
      "lib/jasmine.rb",
      "lib/jasmine/base.rb",
      "lib/jasmine/config.rb",
-     "lib/jasmine/jasmine_helper.rb",
-     "lib/jasmine/jasmine_meta_spec.rb",
      "lib/jasmine/run.html.erb",
      "lib/jasmine/selenium_driver.rb",
      "lib/jasmine/server.rb",
