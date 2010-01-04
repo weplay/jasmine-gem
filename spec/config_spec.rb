@@ -10,44 +10,29 @@ describe Jasmine::Config do
 
   it "should provide a list of all src and spec files" do
     @config.src_files.should == ['javascripts/Example.js']
-    @config.spec_files.should == ['javascript/ExampleSpec.js', 'javascript/SpecHelper.js']
+    @config.spec_files.should == ['javascripts/ExampleSpec.js', 'javascripts/SpecHelper.js']
   end
 
   it "should provide a list of all spec files with full paths" do
     @config.spec_files_full_paths.should == [
-        File.join(@template_dir, 'spec/javascript/ExampleSpec.js'),
-        File.join(@template_dir, 'spec/javascript/SpecHelper.js')
+        File.join(@template_dir, 'spec/javascripts/ExampleSpec.js'),
+        File.join(@template_dir, 'spec/javascripts/SpecHelper.js')
     ]
   end
 
   it "should provide a list of all js files" do
     @config.js_files.should == [
-        '/src/javascripts/Example.js',
-        '/spec/javascript/ExampleSpec.js',
-        '/spec/javascript/SpecHelper.js',
+        '/javascripts/Example.js',
+        '/__spec__/javascripts/ExampleSpec.js',
+        '/__spec__/javascripts/SpecHelper.js',
     ]
   end
 
   it "should provide dir mappings" do
     @config.mappings.should == {
-        '/src' => @config.src_dir,
-        '/spec' => @config.spec_dir
+        '/__root__' => @config.project_root,
+        '/__spec__' => @config.spec_dir
     }
   end
-  
-  it "should allow overriding src and spec paths" do
-    @config.stub!(:src_path).and_return("public")
-    @config.stub!(:spec_path).and_return("spekz")
 
-    @config.js_files.should == [
-        '/public/javascripts/Example.js',
-        '/spekz/javascript/ExampleSpec.js',
-        '/spekz/javascript/SpecHelper.js',
-    ]
-
-    @config.mappings.should == {
-        '/public' => @config.src_dir,
-        '/spekz' => @config.spec_dir
-    }
-  end
 end

@@ -86,16 +86,24 @@ module Jasmine
       Dir.glob(File.join(dir, pattern)).collect {|f| f.sub("#{dir}/", "")}.sort
     end
 
+    def project_root
+      Dir.pwd
+    end
+
+    def src_dir
+      project_root
+    end
+
     def src_files
       match_files(src_dir, "**/*.js")
     end
 
-    def src_path
-      "src"
+    def spec_path
+      "/__spec__"
     end
 
-    def spec_path
-      "spec"
+    def root_path
+      "/__root__"
     end
 
     def spec_files
@@ -104,13 +112,13 @@ module Jasmine
 
     def mappings
       {
-          "/" + src_path => src_dir,
-          "/" + spec_path => spec_dir
+          spec_path => spec_dir,
+          root_path => project_root
       }
     end
 
     def js_files
-      src_files.collect {|f| "/" + File.join(src_path, f) } + spec_files.collect {|f| "/" + File.join(spec_path, f) }
+      src_files.collect {|f| "/" + f } + spec_files.collect {|f| File.join(spec_path, f) }
     end
 
     def spec_files_full_paths
