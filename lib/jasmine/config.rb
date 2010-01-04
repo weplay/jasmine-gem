@@ -98,16 +98,20 @@ module Jasmine
       match_files(src_dir, "**/*.js")
     end
 
+    def spec_dir
+      File.join(project_root, 'spec/javascripts')
+    end
+
+    def spec_files
+      match_files(spec_dir, "**/*.js")
+    end
+
     def spec_path
       "/__spec__"
     end
 
     def root_path
       "/__root__"
-    end
-
-    def spec_files
-      match_files(spec_dir, "**/*.js")
     end
 
     def mappings

@@ -1,9 +1,5 @@
 namespace :jasmine do
   require 'jasmine'
-  helper_overrides = File.expand_path(File.join(File.dirname(__FILE__), "spec/helpers/jasmine_helper.rb"))
-  if File.exist?(helper_overrides)
-    require helper_overrides
-  end
 
   desc "Run continuous integration tests"
   require "spec"
@@ -11,19 +7,17 @@ namespace :jasmine do
   Spec::Rake::SpecTask.new(:ci) do |t|
     t.spec_opts = ["--color", "--format", "specdoc"]
     t.verbose = true
-    t.spec_files = [JasmineHelper.meta_spec_path]
+    t.spec_files = ['spec/javascripts/support/jasmine_rails_spec.rb']
   end
-  task :server do
-    puts "your tests are here:"
-    puts "  http://localhost:8888/run.html"
+    task :server do
+      require 'spec/javascripts/support/jasmine_rails_config'
+      
+      puts "your tests are here:"
+      puts "  http://localhost:8888/run.html"
 
-    Jasmine::Server.start(8888,
-                                File.expand_path(Dir.pwd),
-                                lambda { JasmineHelper.specs },
-                                { :spec_helpers => JasmineHelper.files + JasmineHelper.spec_helpers,
-                                  :stylesheets => JasmineHelper.stylesheets
-                                })
-  end
+      JasmineRailsConfig.new.start_server
+    end
+
 end
 
 desc "Run specs via server"
