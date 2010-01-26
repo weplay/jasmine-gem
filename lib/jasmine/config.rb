@@ -100,9 +100,12 @@ module Jasmine
       end
     end
 
+    def simple_config_file
+      File.join(project_root, 'spec/javascripts/support/sources.yaml')
+    end
+
     def simple_config
-      yaml = File.join(project_root, 'spec/javascripts/support/sources.yaml')
-      config = File.exist?(yaml) ? File.open(yaml) { |yf| YAML::load( yf ) } : false
+      config = File.exist?(simple_config_file) ? File.open(simple_config_file) { |yf| YAML::load( yf ) } : false
       config || {}
     end
 
