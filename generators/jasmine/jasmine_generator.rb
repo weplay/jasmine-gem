@@ -7,8 +7,9 @@ class JasmineGenerator < Rails::Generator::Base
       m.file "spec/javascripts/ExampleSpec.js", "spec/javascripts/ExampleSpec.js"
 
       m.directory "spec/javascripts/support"
-      m.file "spec/javascripts/support/jasmine_rails_config.rb", "spec/javascripts/support/jasmine_rails_config.rb"
-      m.file "spec/javascripts/support/jasmine_rails_spec.rb", "spec/javascripts/support/jasmine_rails_spec.rb"
+      m.file "spec/javascripts/support/jasmine_config.rb", "spec/javascripts/support/jasmine_config.rb"
+      m.file "spec/javascripts/support/jasmine_spec.rb", "spec/javascripts/support/jasmine_spec.rb"
+      m.file "spec/javascripts/support/sources-rails.yaml", "spec/javascripts/support/sources.yaml"
 
       m.directory "lib/tasks"
       m.file "lib/tasks/jasmine.rake", "lib/tasks/jasmine.rake"

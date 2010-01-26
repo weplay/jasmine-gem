@@ -10,7 +10,7 @@ def expand(*paths)
   File.expand_path(File.join(*paths))
 end
 
-def template_path (filepath)
+def template_path(filepath)
   expand(cwd, File.join("generators/jasmine/templates", filepath))
 end
 
@@ -18,9 +18,9 @@ def dest_path(filepath)
   expand(Dir.pwd, filepath)
 end
 
-def copy_unless_exists(relative_path)
+def copy_unless_exists(relative_path, dest_path = nil)
   unless File.exist?(dest_path(relative_path))
-      File.copy(template_path(relative_path), dest_path(relative_path))
+      File.copy(template_path(relative_path), dest_path(dest_path || relative_path))
    end
 end
 
@@ -28,26 +28,28 @@ if ARGV[0] == 'init'
   require 'ftools'
   File.makedirs('spec/javascripts')
   File.makedirs('spec/javascripts/support')
-  File.makedirs('spec/helpers')
 
   copy_unless_exists('spec/javascripts/SpecHelper.js')
   copy_unless_exists('spec/javascripts/ExampleSpec.js')
-  copy_unless_exists('spec/javascripts/support/jasmine_helper.rb')
+  copy_unless_exists('spec/javascripts/support/jasmine_config.rb')
+  copy_unless_exists('spec/javascripts/support/jasmine_spec.rb')
 
   rails_tasks_dir = dest_path('lib/tasks')
   if File.exist?(rails_tasks_dir)
     copy_unless_exists('lib/tasks/jasmine.rake')
+    copy_unless_exists('spec/javascripts/support/sources-rails.yaml', 'spec/javascripts/support/sources.yaml')
   else
+    copy_unless_exists('spec/javascripts/support/sources.yaml')
     if File.exist?(dest_path('Rakefile'))
       load dest_path('Rakefile')
-      unless Rake::Task.task_defined?('jasmine')
-        open(dest_path('Rakefile'), 'a') do |f|
+    end
+    write_mode = Rake::Task.task_defined?('jasmine') ? 'a' : 'w'
+        File.open(dest_path('Rakefile'), write_mode) do |f|
           f.write(File.read(template_path('lib/tasks/jasmine.rake')))
         end
-      end
-    else
-      File.copy(template_path('lib/tasks/jasmine.rake'), dest_path('Rakefile'))
-    end
+  end
+  File.open(template_path('INSTALL'), 'r').each_line do |line|
+    puts line
   end
 end
 

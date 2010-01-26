@@ -7,17 +7,16 @@ namespace :jasmine do
   Spec::Rake::SpecTask.new(:ci) do |t|
     t.spec_opts = ["--color", "--format", "specdoc"]
     t.verbose = true
-    t.spec_files = ['spec/javascripts/support/jasmine_rails_spec.rb']
+    t.spec_files = ['spec/javascripts/support/jasmine_spec.rb']
   end
     task :server do
-      require 'spec/javascripts/support/jasmine_rails_config'
+      require 'spec/javascripts/support/jasmine_config'
       
       puts "your tests are here:"
       puts "  http://localhost:8888/run.html"
 
-      JasmineRailsConfig.new.start_server
+      Jasmine::Config.new.start_server
     end
-
 end
 
 desc "Run specs via server"

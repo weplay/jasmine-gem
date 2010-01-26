@@ -1,6 +1,6 @@
 require 'jasmine'
 
-class JasmineRailsConfig < Jasmine::Config
+class Jasmine::Config
 
   def project_root
     File.expand_path(File.join(File.dirname(__FILE__), "..", "..", ".."))
@@ -11,9 +11,13 @@ class JasmineRailsConfig < Jasmine::Config
 #    match_files(src_dir, "**/*.js")
 #  end
 
-  # Path to your JavaScript source files
-  def src_dir
-    File.join(project_root, "public")
-  end
+# Path to your JavaScript source files
+#  def src_dir
+#    File.join(project_root, "public")
+#  end
 
+# Path to your JavaScript specs
+#  def spec_dir
+#    File.join(project_root, 'spec/javascripts')
+#  end
 end

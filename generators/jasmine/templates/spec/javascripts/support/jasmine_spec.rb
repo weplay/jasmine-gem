@@ -1,7 +1,7 @@
 require 'rubygems'
-require File.expand_path(File.join(File.dirname(__FILE__), 'jasmine_rails_config'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'jasmine_config'))
 
-jasmine_config = JasmineRailsConfig.new
+jasmine_config = Jasmine::Config.new
 spec_builder = Jasmine::SpecBuilder.new(jasmine_config)
 
 should_stop = false
