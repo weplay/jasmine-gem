@@ -97,7 +97,6 @@ module Jasmine
       config || {}
     end
 
-
     def spec_path
       "/__spec__"
     end
@@ -115,7 +114,7 @@ module Jasmine
 
     def js_files(spec_filter = nil)
       spec_files_to_include = spec_filter.nil? ? spec_files : match_files(spec_dir, spec_filter)
-      src_files.collect {|f| "/" + f } + helpers.collect {|f| File.join(spec_path, f) } + spec_files_to_include.collect {|f| File.join(spec_path, f) }
+      environment_files.collect {|f| File.join(spec_path, f) } + src_files.collect {|f| "/" + f } + helpers.collect {|f| File.join(spec_path, f) } + spec_files_to_include.collect {|f| File.join(spec_path, f) }
     end
 
     def css_files
@@ -162,6 +161,14 @@ module Jasmine
       files = []
       if simple_config['src_files']
         files = match_files(src_dir, simple_config['src_files'])
+      end
+      files
+    end
+
+    def environment_files
+      files = []
+      if simple_config['environment_files']
+        files = match_files(spec_dir, simple_config['environment_files'])
       end
       files
     end
