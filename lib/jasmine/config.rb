@@ -1,6 +1,8 @@
 module Jasmine
   class Config
     require 'yaml'
+    
+    attr_reader :jasmine_server_port
 
     def initialize(options = {})
       require 'selenium_rc'
@@ -66,8 +68,16 @@ module Jasmine
 
     def stop_servers
       puts "shutting down the servers..."
-      Jasmine::kill_process_group(@selenium_pid) if @selenium_pid
+      stop_selenium_server
+      stop_jasmine_server
+    end
+
+    def stop_jasmine_server
       Jasmine::kill_process_group(@jasmine_server_pid) if @jasmine_server_pid
+    end
+
+    def stop_selenium_server
+      Jasmine::kill_process_group(@selenium_pid) if @selenium_pid
     end
 
     def run
