@@ -139,43 +139,87 @@ describe Jasmine::Config do
       end
 
 
-      it "using rails jasmine.yml" do
-
-        original_glob = Dir.method(:glob)
-        Dir.stub!(:glob).and_return do |glob_string|
-          if glob_string =~ /public/
-            glob_string
-          else
-            original_glob.call(glob_string)
+      describe "using rails jasmine.yml" do
+        before(:each) do
+          original_glob = Dir.method(:glob)
+          Dir.stub!(:glob).and_return do |glob_string|
+            if glob_string =~ /public/
+              glob_string
+            else
+              original_glob.call(glob_string)
+            end
           end
+          @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
         end
-        @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
-        @config.spec_files.should == ['ExampleSpec.js']
-        @config.helpers.should == ['helpers/SpecHelper.js']
-        @config.src_files.should == ['public/javascripts/prototype.js',
-                                     'public/javascripts/effects.js',
-                                     'public/javascripts/controls.js',
-                                     'public/javascripts/dragdrop.js',
-                                     'public/javascripts/application.js']
-        @config.js_files.should == [
-          '/public/javascripts/prototype.js',
-          '/public/javascripts/effects.js',
-          '/public/javascripts/controls.js',
-          '/public/javascripts/dragdrop.js',
-          '/public/javascripts/application.js',
-          '/__spec__/helpers/SpecHelper.js',
-          '/__spec__/ExampleSpec.js',
-        ]
-        @config.js_files("ExampleSpec.js").should == [
-          '/public/javascripts/prototype.js',
-          '/public/javascripts/effects.js',
-          '/public/javascripts/controls.js',
-          '/public/javascripts/dragdrop.js',
-          '/public/javascripts/application.js',
-          '/__spec__/helpers/SpecHelper.js',
-          '/__spec__/ExampleSpec.js'
-        ]
 
+        it "should include files listed in yml" do
+          @config.spec_files.should == ['ExampleSpec.js']
+          @config.helpers.should == ['helpers/SpecHelper.js']
+          @config.src_files.should == ['public/javascripts/prototype.js',
+                                       'public/javascripts/effects.js',
+                                       'public/javascripts/controls.js',
+                                       'public/javascripts/dragdrop.js',
+                                       'public/javascripts/application.js']
+          @config.js_files.should == [
+            '/public/javascripts/prototype.js',
+            '/public/javascripts/effects.js',
+            '/public/javascripts/controls.js',
+            '/public/javascripts/dragdrop.js',
+            '/public/javascripts/application.js',
+            '/__spec__/helpers/SpecHelper.js',
+            '/__spec__/ExampleSpec.js',
+          ]
+        end
+
+        describe "with spec filter" do
+          it "should include yml src files, helpers and spec matching filter" do
+            @config.js_files("ExampleSpec.js").should == [
+              '/public/javascripts/prototype.js',
+              '/public/javascripts/effects.js',
+              '/public/javascripts/controls.js',
+              '/public/javascripts/dragdrop.js',
+              '/public/javascripts/application.js',
+              '/__spec__/helpers/SpecHelper.js',
+              '/__spec__/ExampleSpec.js',
+            ]
+          end
+          
+          it "should omit non existent specs" do
+            @config.js_files("FooSpec.js").should_not include('/__spec__/FooSpec.js')
+          end
+          
+          it "should include src_files declared in spec file with '//= require'" do
+            @config.stub!(:spec_files).and_return(["FooSpec_.js"])
+            
+            @config.js_files("FooSpec_.js").should == [
+              '/public/javascripts/prototype.js',
+              '/public/javascripts/effects.js',
+              '/public/javascripts/controls.js',
+              '/public/javascripts/dragdrop.js',
+              '/public/javascripts/application.js',
+              '/public/javascripts/example.js',
+              '/__spec__/helpers/SpecHelper.js',
+              '/__spec__/FooSpec_.js'
+            ]
+          end
+
+          it "should not duplicate 'required' src_files" do
+            @config.stub!(:spec_files).and_return(["FooSpec_.js, BarSpec_.js"])
+            
+            @config.js_files("*Spec_.js").should == [
+              '/public/javascripts/prototype.js',
+              '/public/javascripts/effects.js',
+              '/public/javascripts/controls.js',
+              '/public/javascripts/dragdrop.js',
+              '/public/javascripts/application.js',
+              '/public/javascripts/example.js',
+              '/__spec__/helpers/SpecHelper.js',
+              '/__spec__/BarSpec_.js',
+              '/__spec__/FooSpec_.js'
+            ]
+          end
+
+        end
       end
 
     end
@@ -248,7 +292,7 @@ describe Jasmine::Config do
       Jasmine.should_receive(:kill_process_group).with(200)
       config.stop_servers
     end
-    
+
     it "should send kill with SIGINT to WEBrick" do
       Rack::Handler.stub!(:default).and_return(Rack::Handler::WEBrick)
       config = Jasmine::Config.new

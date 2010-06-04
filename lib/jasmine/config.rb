@@ -124,8 +124,14 @@ module Jasmine
     end
 
     def js_files(spec_filter = nil)
-      spec_files_to_include = spec_filter.nil? ? spec_files : match_files(spec_dir, spec_filter)
-      src_files.collect {|f| "/" + f } + helpers.collect {|f| File.join(spec_path, f) } + spec_files_to_include.collect {|f| File.join(spec_path, f) }
+      if spec_filter.nil?
+        spec_files_to_include = spec_files
+        src_files_to_include  = src_files
+      else
+        spec_files_to_include = match_files(spec_dir, spec_filter)
+        src_files_to_include  = src_files + src_files_by_require_line(spec_files_to_include)
+      end
+      src_files_to_include.collect {|f| "/" + f } + [helpers, spec_files_to_include].map { |files| files.collect {|f| File.join(spec_path, f) } }.flatten
     end
 
     def css_files
@@ -174,6 +180,20 @@ module Jasmine
         files = match_files(src_dir, simple_config['src_files'])
       end
       files
+    end
+    
+    def src_files_by_require_line(spec_files)
+      files = []
+      spec_files.collect {|spec_file| File.join(spec_dir, spec_file) }.each do |file|
+        next unless File.exists?(file)
+        File.open(file) do |file|
+          file.each do |line|
+            src_match = line.match(/^\s*\/\/(?:.*)=\s+require\s+\"(.*?)\"\s*$/)
+            files << src_match[1] unless src_match.nil?
+          end
+        end
+      end
+      files.uniq
     end
 
     def spec_files
