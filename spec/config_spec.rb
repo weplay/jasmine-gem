@@ -170,6 +170,27 @@ describe Jasmine::Config do
             '/__spec__/ExampleSpec.js',
           ]
         end
+        
+        describe "environent variable REQUIRE" do
+          before(:each) do
+            ENV.stub!(:[], "REQUIRE").and_return(true)
+          end
+          it "should include src files by '//= require' lines in specs without spec filter" do
+            @config.stub!(:spec_files).and_return(["BarSpec_.js", "FooSpec_.js"])
+            
+            @config.js_files.should == [
+              '/public/javascripts/prototype.js',
+              '/public/javascripts/effects.js',
+              '/public/javascripts/controls.js',
+              '/public/javascripts/dragdrop.js',
+              '/public/javascripts/application.js',
+              '/public/javascripts/example.js',
+              '/__spec__/helpers/SpecHelper.js',
+              '/__spec__/BarSpec_.js',
+              '/__spec__/FooSpec_.js'
+            ]
+          end
+        end
 
         describe "with spec filter" do
           it "should include yml src files, helpers and spec matching filter" do
@@ -204,7 +225,7 @@ describe Jasmine::Config do
           end
 
           it "should not duplicate 'required' src_files" do
-            @config.stub!(:spec_files).and_return(["FooSpec_.js, BarSpec_.js"])
+            @config.stub!(:spec_files).and_return(["BarSpec_.js", "FooSpec_.js"])
             
             @config.js_files("*Spec_.js").should == [
               '/public/javascripts/prototype.js',

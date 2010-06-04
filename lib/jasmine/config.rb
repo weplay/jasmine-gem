@@ -127,6 +127,7 @@ module Jasmine
       if spec_filter.nil?
         spec_files_to_include = spec_files
         src_files_to_include  = src_files
+        src_files_to_include += src_files_by_require_line(spec_files_to_include) if ENV["REQUIRE"]
       else
         spec_files_to_include = match_files(spec_dir, spec_filter)
         src_files_to_include  = src_files + src_files_by_require_line(spec_files_to_include)
