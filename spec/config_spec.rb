@@ -35,7 +35,6 @@ describe Jasmine::Config do
       shared_examples_for "simple_config defaults" do
         it "should return the correct files and mappings" do
           @config.src_files.should == []
-          @config.environment_files.should == []
           @config.stylesheets.should == []
           @config.spec_files.should == ['ExampleSpec.js']
           @config.helpers.should == ['helpers/SpecHelper.js']
@@ -139,14 +138,6 @@ describe Jasmine::Config do
         @config.stylesheets.should == ['foo.css', 'bar.css']
       end
 
-      it "simple_config environments" do
-        @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine.yml'))
-        YAML.stub!(:load).and_return({'helpers' => [], 'spec_files' => [], 'environment_files' => ['enviroment.js', 'before.js']})
-        Dir.stub!(:glob).and_return do |glob_string|
-          glob_string
-        end
-        @config.js_files.should == ['/__spec__/enviroment.js', '/__spec__/before.js']
-      end
 
       it "using rails jasmine.yml" do
 
