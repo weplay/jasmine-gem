@@ -1,5 +1,7 @@
-require File.expand_path('../../.bundle/environment', __FILE__)
-Bundler.require(:default, :test)
+require "rubygems"
+require "bundler"
+
+Bundler.setup(:default, :test)
 
 require 'spec'
 

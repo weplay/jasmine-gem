@@ -1,6 +1,7 @@
 module Jasmine
   class Config
     require 'yaml'
+    require 'erb'
     
     attr_reader :jasmine_server_port
 
@@ -14,7 +15,8 @@ module Jasmine
     end
 
     def start_server(port = 8888)
-      Jasmine::Server.new(port, self).start
+      handler = Rack::Handler.default
+      handler.run Jasmine.app(self), :Port => port, :AccessLog => []
     end
 
     def start
@@ -34,10 +36,9 @@ module Jasmine
 
     def start_jasmine_server
       @jasmine_server_port = Jasmine::find_unused_port
-      server = Jasmine::Server.new(@jasmine_server_port, self)
       @jasmine_server_pid = fork do
         Process.setpgrp
-        server.start
+        start_server(@jasmine_server_port)
         exit! 0
       end
       puts "jasmine server started.  pid is #{@jasmine_server_pid}"
@@ -73,7 +74,13 @@ module Jasmine
     end
 
     def stop_jasmine_server
-      Jasmine::kill_process_group(@jasmine_server_pid) if @jasmine_server_pid
+      if @jasmine_server_pid
+        if Rack::Handler.default == Rack::Handler::WEBrick
+          Jasmine::kill_process_group(@jasmine_server_pid, "INT")
+        else
+          Jasmine::kill_process_group(@jasmine_server_pid)
+        end
+      end
     end
 
     def stop_selenium_server
@@ -99,11 +106,11 @@ module Jasmine
       dir = File.expand_path(dir)
       patterns.collect do |pattern|
         Dir.glob(File.join(dir, pattern)).collect {|f| f.sub("#{dir}/", "")}.sort
-      end.flatten
+      end.flatten.uniq
     end
 
     def simple_config
-      config = File.exist?(simple_config_file) ? File.open(simple_config_file) { |yf| YAML::load( yf ) } : false
+      config = File.exist?(simple_config_file) ? YAML::load(ERB.new(File.read(simple_config_file)).result(binding)) : false
       config || {}
     end
 
@@ -113,13 +120,6 @@ module Jasmine
 
     def root_path
       "/__root__"
-    end
-
-    def mappings
-      {
-        spec_path => spec_dir,
-        root_path => project_root
-      }
     end
 
     def js_files(spec_filter = nil)

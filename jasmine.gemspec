@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jasmine}
-  s.version = "0.10.3.1"
+  s.version = "0.10.3.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rajan Agaskar", "Christian Williams"]
-  s.date = %q{2010-04-02}
+  s.date = %q{2010-04-27}
   s.default_executable = %q{jasmine}
   s.description = %q{Javascript BDD test framework}
   s.email = %q{ragaskar@gmail.com}
@@ -58,24 +58,18 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rspec>, [">= 1.1.5"])
-      s.add_runtime_dependency(%q<json>, [">= 1.1.9"])
       s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
-      s.add_runtime_dependency(%q<thin>, [">= 1.2.4"])
       s.add_runtime_dependency(%q<selenium-rc>, [">= 2.1.0"])
       s.add_runtime_dependency(%q<selenium-client>, [">= 1.2.17"])
     else
       s.add_dependency(%q<rspec>, [">= 1.1.5"])
-      s.add_dependency(%q<json>, [">= 1.1.9"])
       s.add_dependency(%q<rack>, [">= 1.0.0"])
-      s.add_dependency(%q<thin>, [">= 1.2.4"])
       s.add_dependency(%q<selenium-rc>, [">= 2.1.0"])
       s.add_dependency(%q<selenium-client>, [">= 1.2.17"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 1.1.5"])
-    s.add_dependency(%q<json>, [">= 1.1.9"])
     s.add_dependency(%q<rack>, [">= 1.0.0"])
-    s.add_dependency(%q<thin>, [">= 1.2.4"])
     s.add_dependency(%q<selenium-rc>, [">= 2.1.0"])
     s.add_dependency(%q<selenium-client>, [">= 1.2.17"])
   end

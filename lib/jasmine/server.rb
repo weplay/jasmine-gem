@@ -1,3 +1,29 @@
+require 'rack'
+
+# Backport Rack::Handler.default from Rack 1.1.0 for Rails 2.3.x compatibility.
+unless Rack::Handler.respond_to?(:default)
+  module Rack::Handler
+    def self.default(options = {})
+      # Guess.
+      if ENV.include?("PHP_FCGI_CHILDREN")
+        # We already speak FastCGI
+        options.delete :File
+        options.delete :Port
+
+        Rack::Handler::FastCGI
+      elsif ENV.include?("REQUEST_METHOD")
+        Rack::Handler::CGI
+      else
+        begin
+          Rack::Handler::Mongrel
+        rescue LoadError => e
+          Rack::Handler::WEBrick
+        end
+      end
+    end
+  end
+end
+
 module Jasmine
   class RunAdapter
     def initialize(config)
@@ -13,8 +39,7 @@ module Jasmine
 
     def call(env)
       return not_found if env["PATH_INFO"] != "/"
-      return [200, { 'Content-Type' => 'text/html' }, ''] if (env['REQUEST_METHOD'] == 'HEAD')
-      run if env['REQUEST_METHOD'] == 'GET'
+      run
     end
 
     def not_found
@@ -37,8 +62,6 @@ module Jasmine
         body
       ]
     end
-
-
   end
 
   class Redirect
@@ -74,49 +97,25 @@ module Jasmine
       run_adapter = Jasmine::RunAdapter.new(@config)
       run_adapter.run(env["PATH_INFO"])
     end
-
   end
 
-  class Server
-    attr_reader :thin
+  def self.app(config)
+    Rack::Builder.app do
+      use Rack::Head
 
-    def initialize(port, config)
-      @port = port
-      @config = config
+      map('/run.html')         { run Jasmine::Redirect.new('/') }
+      map('/__suite__')        { run Jasmine::FocusedSuite.new(config) }
 
-      require 'thin'
-      thin_config = {
-        '/__suite__/' => Jasmine::FocusedSuite.new(@config),
-        '/run.html' => Jasmine::Redirect.new('/'),
-        '/' => Jasmine::RunAdapter.new(@config)
-      }
+      map('/__JASMINE_ROOT__') { run Rack::File.new(Jasmine.root) }
+      map(config.spec_path)    { run Rack::File.new(config.spec_dir) }
+      map(config.root_path)    { run Rack::File.new(config.project_root) }
 
-      @config.mappings.each do |from, to|
-        thin_config[from] = Rack::File.new(to)
+      map('/') do
+        run Rack::Cascade.new([
+          Rack::URLMap.new('/' => Rack::File.new(config.src_dir)),
+          Jasmine::RunAdapter.new(config)
+        ])
       end
-
-      thin_config["/__JASMINE_ROOT__"] = Rack::File.new(Jasmine.root)
-
-      app = Rack::Cascade.new([
-        Rack::URLMap.new({'/' => Rack::File.new(@config.src_dir)}),
-        Rack::URLMap.new(thin_config)
-#        JsAlert.new
-      ])
-#      Thin::Logging.trace = true
-      @thin = Thin::Server.new('0.0.0.0', @port, app)
-    end
-
-    def start
-      begin
-        thin.start
-      rescue RuntimeError => e
-        raise e unless e.message == 'no acceptor'
-        raise RuntimeError.new("A server is already running on port #{@port}")
-      end
-    end
-
-    def stop
-      thin.stop
     end
   end
 end
