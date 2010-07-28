@@ -4,6 +4,26 @@ describe Jasmine::Config do
 
   describe "configuration" do
 
+    before(:all) do
+      temp_dir_before
+
+      Dir::chdir @tmp
+      system 'rails rails-project'
+      Dir::chdir 'rails-project'
+
+      FileUtils.cp_r(File.join(@root, 'generators'), 'vendor')
+
+      system "./script/generate jasmine"
+
+      Dir::chdir @old_dir
+
+      @rails_dir = "#{@tmp}/rails-project"
+    end
+
+    after(:all) do
+      temp_dir_after
+    end
+
     before(:each) do
       @template_dir = File.expand_path(File.join(File.dirname(__FILE__), "../generators/jasmine/templates"))
       @config = Jasmine::Config.new
@@ -28,25 +48,25 @@ describe Jasmine::Config do
 
     describe "simple_config" do
       before(:each) do
-        @config.stub!(:src_dir).and_return(File.join(@template_dir))
-        @config.stub!(:spec_dir).and_return(File.join(@template_dir, "spec/javascripts"))
+        @config.stub!(:src_dir).and_return(File.join(@rails_dir, "."))
+        @config.stub!(:spec_dir).and_return(File.join(@rails_dir, "spec/javascripts"))
       end
 
       shared_examples_for "simple_config defaults" do
         it "should return the correct files and mappings" do
           @config.src_files.should == []
           @config.stylesheets.should == []
-          @config.spec_files.should == ['ExampleSpec.js']
+          @config.spec_files.should == ['PlayerSpec.js']
           @config.helpers.should == ['helpers/SpecHelper.js']
           @config.js_files.should == [
             '/__spec__/helpers/SpecHelper.js',
-            '/__spec__/ExampleSpec.js',
+            '/__spec__/PlayerSpec.js',
           ]
-          @config.js_files("ExampleSpec.js").should ==
+          @config.js_files("PlayerSpec.js").should ==
             ['/__spec__/helpers/SpecHelper.js',
-             '/__spec__/ExampleSpec.js']
+             '/__spec__/PlayerSpec.js']
           @config.spec_files_full_paths.should == [
-            File.join(@template_dir, 'spec/javascripts/ExampleSpec.js'),
+            File.join(@rails_dir, 'spec/javascripts/PlayerSpec.js'),
           ]
         end
       end
@@ -80,13 +100,13 @@ describe Jasmine::Config do
 
       end
 
-      describe "using default jasmine.yml" do
-        before(:each) do
-          @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine.yml'))
-        end
-        it_should_behave_like "simple_config defaults"
-
-      end
+#      describe "using default jasmine.yml" do
+#        before(:each) do
+#          @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine.yml'))
+#        end
+#        it_should_behave_like "simple_config defaults"
+#
+#      end
 
       describe "should use the first appearance of duplicate filenames" do
         before(:each) do
@@ -123,8 +143,10 @@ describe Jasmine::Config do
         end
 
         it "spec_files_full_paths" do
-          @config.spec_files_full_paths.should == [File.expand_path("../../generators/jasmine/templates/spec/javascripts/file1.ext", __FILE__),
-                                                   File.expand_path("../../generators/jasmine/templates/spec/javascripts/file2.ext", __FILE__)]
+          @config.spec_files_full_paths.should == [
+              File.expand_path("spec/javascripts/file1.ext", @rails_dir),
+              File.expand_path("spec/javascripts/file2.ext", @rails_dir)
+          ]
         end
 
       end
@@ -138,59 +160,39 @@ describe Jasmine::Config do
         @config.stylesheets.should == ['foo.css', 'bar.css']
       end
 
-
-      describe "using rails jasmine.yml" do
-        before(:each) do
-          original_glob = Dir.method(:glob)
-          Dir.stub!(:glob).and_return do |glob_string|
-            if glob_string =~ /public/
-              glob_string
-            else
-              original_glob.call(glob_string)
-            end
-          end
-          @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
-        end
-
-        it "should include files listed in yml" do
-          @config.spec_files.should == ['ExampleSpec.js']
-          @config.helpers.should == ['helpers/SpecHelper.js']
-          @config.src_files.should == ['public/javascripts/prototype.js',
-                                       'public/javascripts/effects.js',
-                                       'public/javascripts/controls.js',
-                                       'public/javascripts/dragdrop.js',
-                                       'public/javascripts/application.js']
-          @config.js_files.should == [
-            '/public/javascripts/prototype.js',
-            '/public/javascripts/effects.js',
-            '/public/javascripts/controls.js',
-            '/public/javascripts/dragdrop.js',
-            '/public/javascripts/application.js',
-            '/__spec__/helpers/SpecHelper.js',
-            '/__spec__/ExampleSpec.js',
-          ]
-        end
-        
-        describe "environent variable REQUIRE" do
-          before(:each) do
-            ENV.stub!(:[], "REQUIRE").and_return(true)
-          end
-          it "should include src files by '//= require' lines in specs without spec filter" do
-            @config.stub!(:spec_files).and_return(["BarSpec_.js", "FooSpec_.js"])
-            
-            @config.js_files.should == [
-              '/public/javascripts/prototype.js',
-              '/public/javascripts/effects.js',
-              '/public/javascripts/controls.js',
-              '/public/javascripts/dragdrop.js',
-              '/public/javascripts/application.js',
-              '/public/javascripts/example.js',
-              '/__spec__/helpers/SpecHelper.js',
-              '/__spec__/BarSpec_.js',
-              '/__spec__/FooSpec_.js'
-            ]
-          end
-        end
+      it "using rails jasmine.yml" do
+        @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
+        @config.spec_files.should == ['PlayerSpec.js']
+        @config.helpers.should == ['helpers/SpecHelper.js']
+        @config.src_files.should == ['public/javascripts/prototype.js',
+                                     'public/javascripts/effects.js',
+                                     'public/javascripts/controls.js',
+                                     'public/javascripts/dragdrop.js',
+                                     'public/javascripts/application.js',
+                                     'public/javascripts/Player.js',
+                                     'public/javascripts/Song.js']
+        @config.js_files.should == [
+          '/public/javascripts/prototype.js',
+          '/public/javascripts/effects.js',
+          '/public/javascripts/controls.js',
+          '/public/javascripts/dragdrop.js',
+          '/public/javascripts/application.js',
+          '/public/javascripts/Player.js',
+          '/public/javascripts/Song.js',
+          '/__spec__/helpers/SpecHelper.js',
+          '/__spec__/PlayerSpec.js',
+        ]
+        @config.js_files("PlayerSpec.js").should == [
+          '/public/javascripts/prototype.js',
+          '/public/javascripts/effects.js',
+          '/public/javascripts/controls.js',
+          '/public/javascripts/dragdrop.js',
+          '/public/javascripts/application.js',
+          '/public/javascripts/Player.js',
+          '/public/javascripts/Song.js',
+          '/__spec__/helpers/SpecHelper.js',
+          '/__spec__/PlayerSpec.js'
+        ]
 
         describe "with spec filter" do
           it "should include yml src files, helpers and spec matching filter" do

@@ -1,7 +1,7 @@
 jasmine-gem
 ============
 
-Jasmine Ruby dynamically serves HTML suites for [Jasmine](http://github.com/pivotal/jasmine)
+Jasmine Gem dynamically serves HTML suites for [Jasmine](http://github.com/pivotal/jasmine)
 
 To use:
 
@@ -9,11 +9,15 @@ To use:
 
 Post-installation:
 
-For Rails support, use
+For Rails2 support, use
 
 `script/generate jasmine`
 
-For other projects, use
+For Rails3 support, use
+
+`bundle exec jasmine init`
+
+For other Ruby projects (including Merb), use
 
 `jasmine init`
 
@@ -27,7 +31,7 @@ You may also
 
 `rake jasmine:ci`
 
-which will run your Jasmine suites using selenium and rspec. This task is suitable for running in continuous integration environments.
+which will run your Jasmine suites using selenium and rspec. This task is suitable for running in continuous integration environments.  There is currently a known issue using this rake task with RSpec2 beta.
 
 Simple Configuration:
 
@@ -35,3 +39,5 @@ Customize `spec/javascripts/support/jasmine.yml` to enumerate the source files, 
 You may use dir glob strings.
 
 It is also possible to add overrides into the `spec/javascripts/support/jasmine_config.rb` file directly if you require further customization.
+
+Copyright (c) 2010 Pivotal Labs. This software is licensed under the MIT License.

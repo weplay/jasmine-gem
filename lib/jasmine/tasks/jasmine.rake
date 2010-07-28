@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 namespace :jasmine do
   task :require do
     require 'jasmine'
@@ -30,7 +29,3 @@ end
 
 desc "Run specs via server"
 task :jasmine => ['jasmine:server']
-=======
-require 'jasmine'
-load 'jasmine/tasks/jasmine.rake'
->>>>>>> pivotal/master

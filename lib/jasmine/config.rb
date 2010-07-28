@@ -2,7 +2,6 @@ module Jasmine
   class Config
     require 'yaml'
     require 'erb'
-    
     attr_reader :jasmine_server_port
 
     def initialize(options = {})
@@ -85,6 +84,13 @@ module Jasmine
 
     def stop_selenium_server
       Jasmine::kill_process_group(@selenium_pid) if @selenium_pid
+      if @jasmine_server_pid
+        if Rack::Handler.default == Rack::Handler::WEBrick
+          Jasmine::kill_process_group(@jasmine_server_pid, "INT")
+        else
+          Jasmine::kill_process_group(@jasmine_server_pid)
+        end
+      end
     end
 
     def run
@@ -105,7 +111,8 @@ module Jasmine
     def match_files(dir, patterns)
       dir = File.expand_path(dir)
       patterns.collect do |pattern|
-        Dir.glob(File.join(dir, pattern)).collect {|f| f.sub("#{dir}/", "")}.sort
+        matches = Dir.glob(File.join(dir, pattern))
+        matches.collect {|f| f.sub("#{dir}/", "")}.sort
       end.flatten.uniq
     end
 
@@ -168,19 +175,19 @@ module Jasmine
     end
 
     def helpers
-      files = match_files(spec_dir, "helpers/**/*.js")
       if simple_config['helpers']
-        files = match_files(spec_dir, simple_config['helpers'])
+        match_files(spec_dir, simple_config['helpers'])
+      else
+        match_files(spec_dir, ["helpers/**/*.js"])
       end
-      files
     end
 
     def src_files
-      files = []
       if simple_config['src_files']
-        files = match_files(src_dir, simple_config['src_files'])
+        match_files(src_dir, simple_config['src_files'])
+      else
+        []
       end
-      files
     end
     
     def src_files_by_require_line(spec_files)
@@ -198,19 +205,19 @@ module Jasmine
     end
 
     def spec_files
-      files = match_files(spec_dir, "**/*[sS]pec.js")
       if simple_config['spec_files']
-        files = match_files(spec_dir, simple_config['spec_files'])
+        match_files(spec_dir, simple_config['spec_files'])
+      else
+        match_files(spec_dir, ["**/*[sS]pec.js"])
       end
-      files
     end
 
     def stylesheets
-      files = []
       if simple_config['stylesheets']
-        files = match_files(src_dir, simple_config['stylesheets'])
+        match_files(src_dir, simple_config['stylesheets'])
+      else
+        []
       end
-      files
     end
 
   end
