@@ -194,51 +194,47 @@ describe Jasmine::Config do
           '/__spec__/PlayerSpec.js'
         ]
 
-        describe "with spec filter" do
-          it "should include yml src files, helpers and spec matching filter" do
-            @config.js_files("ExampleSpec.js").should == [
-              '/public/javascripts/prototype.js',
-              '/public/javascripts/effects.js',
-              '/public/javascripts/controls.js',
-              '/public/javascripts/dragdrop.js',
-              '/public/javascripts/application.js',
-              '/__spec__/helpers/SpecHelper.js',
-              '/__spec__/ExampleSpec.js',
-            ]
-          end
-          
-          it "should omit non existent specs" do
-            @config.js_files("FooSpec.js").should_not include('/__spec__/FooSpec.js')
-          end
-          
+      end
+
+      it "should omit non existent specs" do
+        @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
+        @config.js_files("FooSpec.js").should_not include('/__spec__/FooSpec.js')
+      end
+
+      describe "requiring src files" do
+        before(:each) do
+          @config.stub!(:simple_config_file).and_return(File.join(@template_dir, 'spec/javascripts/support/jasmine-rails.yml'))
+          @config.stub!(:src_files).and_return([])
+        end
+        
+        it "environent variable REQUIRE" do
+          @config.stub!(:spec_files).and_return(["SongSpek.js"])
+          ENV.stub!(:[], "REQUIRE").and_return(true)
+
+          @config.js_files.should == [
+            '/public/javascripts/Song.js',
+            '/__spec__/helpers/SpecHelper.js',
+            '/__spec__/SongSpek.js'
+          ]
+        end
+
+        describe "//= require style js file includes with spec filter" do
+
           it "should include src_files declared in spec file with '//= require'" do
-            @config.stub!(:spec_files).and_return(["FooSpec_.js"])
-            
-            @config.js_files("FooSpec_.js").should == [
-              '/public/javascripts/prototype.js',
-              '/public/javascripts/effects.js',
-              '/public/javascripts/controls.js',
-              '/public/javascripts/dragdrop.js',
-              '/public/javascripts/application.js',
-              '/public/javascripts/example.js',
+            @config.js_files("SongSpek.js").should == [
+              '/public/javascripts/Song.js',
               '/__spec__/helpers/SpecHelper.js',
-              '/__spec__/FooSpec_.js'
+              '/__spec__/SongSpek.js'
             ]
           end
 
           it "should not duplicate 'required' src_files" do
-            @config.stub!(:spec_files).and_return(["BarSpec_.js", "FooSpec_.js"])
-            
-            @config.js_files("*Spec_.js").should == [
-              '/public/javascripts/prototype.js',
-              '/public/javascripts/effects.js',
-              '/public/javascripts/controls.js',
-              '/public/javascripts/dragdrop.js',
-              '/public/javascripts/application.js',
-              '/public/javascripts/example.js',
+            @config.stub!(:spec_files).and_return(["SongSpek.js", "SongSpek.js"])
+
+            @config.js_files("*Spek.js").should == [
+              '/public/javascripts/Song.js',
               '/__spec__/helpers/SpecHelper.js',
-              '/__spec__/BarSpec_.js',
-              '/__spec__/FooSpec_.js'
+              '/__spec__/SongSpek.js'
             ]
           end
 

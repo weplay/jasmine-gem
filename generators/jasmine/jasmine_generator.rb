@@ -8,6 +8,7 @@ class JasmineGenerator < Rails::Generator::Base
 
       m.directory "spec/javascripts"
       m.file "jasmine-example/spec/PlayerSpec.js", "spec/javascripts/PlayerSpec.js"
+      m.file "jasmine-example/spec/SongSpek.js", "spec/javascripts/SongSpek.js"
 
       m.directory "spec/javascripts/helpers"
       m.file "jasmine-example/spec/SpecHelper.js", "spec/javascripts/helpers/SpecHelper.js"

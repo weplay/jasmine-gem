@@ -11,6 +11,7 @@ group :test do
   gem "rack-test", :require => "rack/test"
   gem "selenium-rc", "2.2.1"
   gem "selenium-client", "1.2.18"
+  gem "ruby-debug", "0.10.3"
   # this needs to be installed to test the Rails2 generator
   gem "rails", "~>2.3.5"
 end

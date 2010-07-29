@@ -84,13 +84,6 @@ module Jasmine
 
     def stop_selenium_server
       Jasmine::kill_process_group(@selenium_pid) if @selenium_pid
-      if @jasmine_server_pid
-        if Rack::Handler.default == Rack::Handler::WEBrick
-          Jasmine::kill_process_group(@jasmine_server_pid, "INT")
-        else
-          Jasmine::kill_process_group(@jasmine_server_pid)
-        end
-      end
     end
 
     def run
@@ -139,7 +132,9 @@ module Jasmine
         spec_files_to_include = match_files(spec_dir, spec_filter)
         src_files_to_include  = src_files + src_files_by_require_line(spec_files_to_include)
       end
-      src_files_to_include.collect {|f| "/" + f } + [helpers, spec_files_to_include].map { |files| files.collect {|f| File.join(spec_path, f) } }.flatten
+      src_files_to_include.collect {|f| "/" + f } + [helpers, spec_files_to_include].map { |files| 
+        files.collect {|f| File.join(spec_path, f) }
+      }.flatten
     end
 
     def css_files
