@@ -7,9 +7,9 @@ gem "gemcutter", "0.5.0"
 group :test do
   gem "json_pure", "~>1.4.3"
   gem "rspec", "1.3.0"
-  gem "rack", "~>1.0.0"
+  gem "rack", "1.1.0"
   gem "rack-test", :require => "rack/test"
-  gem "selenium-rc", "2.2.1"
+  gem "selenium-rc", "2.2.4"
   gem "selenium-client", "1.2.18"
   gem "ruby-debug", "0.10.3"
   # this needs to be installed to test the Rails2 generator
