@@ -3,7 +3,7 @@ module Jasmine
     require 'yaml'
     require 'erb'
     
-    attr_reader :jasmine_server_port
+    attr_reader :jasmine_server_port, :jasmine_server_pid
 
     def initialize(options = {})
       require 'selenium_rc'
