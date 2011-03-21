@@ -65,20 +65,20 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<rspec>, [">= 1.1.5"])
-      s.add_runtime_dependency(%q<rack>, [">= 1.0.0"])
-      s.add_runtime_dependency(%q<selenium-rc>, [">= 2.1.0"])
-      s.add_runtime_dependency(%q<selenium-client>, [">= 1.2.17"])
+      s.add_runtime_dependency(%q<rack>, ["1.1.0"])
+      s.add_runtime_dependency(%q<selenium-rc>, ["2.2.0"])
+      s.add_runtime_dependency(%q<selenium-client>, ["1.2.18"])
     else
       s.add_dependency(%q<rspec>, [">= 1.1.5"])
-      s.add_dependency(%q<rack>, [">= 1.0.0"])
-      s.add_dependency(%q<selenium-rc>, [">= 2.1.0"])
-      s.add_dependency(%q<selenium-client>, [">= 1.2.17"])
+      s.add_dependency(%q<rack>, ["1.1.0"])
+      s.add_dependency(%q<selenium-rc>, ["2.2.4"])
+      s.add_dependency(%q<selenium-client>, ["1.2.18"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 1.1.5"])
-    s.add_dependency(%q<rack>, [">= 1.0.0"])
-    s.add_dependency(%q<selenium-rc>, [">= 2.1.0"])
-    s.add_dependency(%q<selenium-client>, [">= 1.2.17"])
+    s.add_dependency(%q<rack>, ["1.1.0"])
+    s.add_dependency(%q<selenium-rc>, ["2.2.4"])
+    s.add_dependency(%q<selenium-client>, ["1.2.18"])
   end
 end
 
