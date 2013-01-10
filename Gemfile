@@ -2,7 +2,7 @@ source :gemcutter
 
 gem "rake", "0.8.7"
 gem "jeweler", "1.4.0"
-gem "gemcutter", "0.5.0"
+gem "gemcutter", "~> 0.6"
 
 group :test do
   gem "json_pure", "~>1.4.3"
